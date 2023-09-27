@@ -12,7 +12,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.mysite.sbb.DataNotFoundException;
-
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -37,11 +36,14 @@ public class QuestionService {
         }
     }
     
-    public void create(String subject, String content) {
-    	Question q = new Question();
-    	q.setSubject(subject);
-    	q.setContent(content);
-    	q.setCreateDate(LocalDateTime.now());
-    	this.questionRepository.save(q);
+    public void modify(Question question, String subject, String content) {
+    	question.setSubject(subject);
+    	question.setContent(content);
+    	question.setCreateDate(LocalDateTime.now());
+    	this.questionRepository.save(question);
+    }
+    
+    public void delete(Question question) {
+        this.questionRepository.delete(question);
     }
 }
