@@ -49,7 +49,7 @@ public class AnswerController {
     public String answerModify(AnswerForm answerForm, @PathVariable("id") Integer id, Principal principal) {
         Answer answer = this.answerService.getAnswer(id);
         if (!answer.getAuthor().getUsername().equals(principal.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You don't have qualify with the right to modification.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You don't have the right to modification.");
         }
         answerForm.setContent(answer.getContent());
         return "answer_form";
@@ -64,7 +64,7 @@ public class AnswerController {
         }
         Answer answer = this.answerService.getAnswer(id);
         if (!answer.getAuthor().getUsername().equals(principal.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You don't have qualify with the right to modification.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You don't have the right to modification.");
         }
         this.answerService.modify(answer, answerForm.getContent());
         return String.format("redirect:/question/detail/%s", answer.getQuestion().getId());
@@ -75,9 +75,18 @@ public class AnswerController {
     public String answerDelete(Principal principal, @PathVariable("id") Integer id) {
         Answer answer = this.answerService.getAnswer(id);
         if (!answer.getAuthor().getUsername().equals(principal.getName())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You don't have qualify with the right to delete.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You don't have the right to delete.");
         }
         this.answerService.delete(answer);
+        return String.format("redirect:/question/detail/%s", answer.getQuestion().getId());
+    }
+    
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/vote/{id}")
+    public String answerVote(Principal principal, @PathVariable("id") Integer id) {
+        Answer answer = this.answerService.getAnswer(id);
+        SiteUser siteUser = this.userService.getUser(principal.getName());
+        this.answerService.vote(answer, siteUser);
         return String.format("redirect:/question/detail/%s", answer.getQuestion().getId());
     }
 }

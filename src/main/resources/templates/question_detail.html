@@ -18,6 +18,11 @@
                 </div>
             </div>
             <div class="my-3">
+				<a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+	                th:data-uri="@{|/question/vote/${question.id}|}">
+	                Recommend
+	                <span class="badge rounded-pill bg-success" th:text="${#lists.size(question.voter)}"></span>
+	            </a>
 	            <a th:href="@{|/question/modify/${question.id}|}" class="btn btn-sm btn-outline-secondary"
 	                sec:authorize="isAuthenticated()"
 	                th:if="${question.author != null and #authentication.getPrincipal().getUsername() == question.author.username}"
@@ -29,10 +34,10 @@
 	        </div>
         </div>
     </div>
-    <!-- Show number of answer(s) -->
+    <!-- Show number(s) of answer(s) -->
     <h5 class="border-bottom my-3 py-2" 
-        th:text="|There is/are ${#lists.size(question.answerList)}.|"></h5>
-    <!-- Start loof for Answer -->
+        th:text="|There is/are ${#lists.size(question.answerList)}(s) answer(s) confirm.|"></h5>
+    <!-- Start loop of answer -->
     <div class="card my-3" th:each="answer : ${question.answerList}">
         <div class="card-body">
             <div class="card-text" style="white-space: pre-line;" th:text="${answer.content}"></div>
@@ -49,6 +54,11 @@
                 </div>
             </div>
             <div class="my-3">
+				<a href="javascript:void(0);" class="recommend btn btn-sm btn-outline-secondary"
+	                th:data-uri="@{|/answer/vote/${answer.id}|}">
+	                Recommend
+	                <span class="badge rounded-pill bg-success" th:text="${#lists.size(answer.voter)}"></span>
+	            </a>
 	            <a th:href="@{|/answer/modify/${answer.id}|}" class="btn btn-sm btn-outline-secondary"
 	                sec:authorize="isAuthenticated()"
 	                th:if="${answer.author != null and #authentication.getPrincipal().getUsername() == answer.author.username}"
@@ -60,20 +70,28 @@
 	        </div>
         </div>
     </div>
-    <!-- End of loof for Answer -->
-    <!-- submit Answer -->
-	<form th:action="@{|/answer/create/${question.id}|}" th:object="${answerForm}" method="post" class="my-3">
-		<div th:replace="~{form_errors :: formErrorsFragment}"></div>
-		<textarea sec:authorize="isAnonymous()" disabled th:field="*{content}" class="form-control" rows="10"></textarea>
-		<textarea sec:authorize="isAuthenticated()" th:field="*{content}" class="form-control" rows="10"></textarea>
-		<input type="submit" value="Submit" class="btn btn-primary my-2">
-	</form>
+    <!-- End of loop answer  -->
+    <!-- Submit Answer -->
+    <form th:action="@{|/answer/create/${question.id}|}" th:object="${answerForm}" method="post" class="my-3">
+        <div th:replace="~{form_errors :: formErrorsFragment}"></div>
+        <textarea sec:authorize="isAnonymous()" disabled th:field="*{content}" class="form-control" rows="10"></textarea>
+        <textarea sec:authorize="isAuthenticated()" th:field="*{content}" class="form-control" rows="10"></textarea>
+        <input type="submit" value="Submit" class="btn btn-primary my-2">
+    </form>
 </div>
 <script layout:fragment="script" type='text/javascript'>
 const delete_elements = document.getElementsByClassName("delete");
 Array.from(delete_elements).forEach(function(element) {
     element.addEventListener('click', function() {
         if(confirm("Are you sure?")) {
+            location.href = this.dataset.uri;
+        };
+    });
+});
+const recommend_elements = document.getElementsByClassName("recommend");
+Array.from(recommend_elements).forEach(function(element) {
+    element.addEventListener('click', function() {
+        if(confirm("You're recommend this. aren't you?")) {
             location.href = this.dataset.uri;
         };
     });
